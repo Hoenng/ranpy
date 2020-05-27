@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Apr 20 14:56:45 2020
-
-@author: - not me
-"""
 # how to clean up connections on failure?
 # make the rw a parameter
 
