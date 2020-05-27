@@ -4,14 +4,17 @@ import sys
 import os
 import glob
 import enum
+import platform
 
 
-#Example ./find.py '/mnt/d/bin/' -name '*.py'
-#Example ./find.py '/mnt/d/bin/' -size 1MB
+#Example ./find.py '/mnt/d/bin/' -name '*.py'. 
+#Example ./find.py '/mnt/d/bin/' -size 1MB. 
+#Example .\find.py D:\bin\ -name '*.py'.
+#Example .\find.py D:\bin\ -size 1MB. 
 #That trailing / is essential
 
  
-def findFile(search_dir,search_type, search_object):
+def findFile(search_dir,search_type, search_object, iter_dir):
 
     # if it is a size search search_object will contain size
     # move that value to search_size and change search_object
@@ -28,8 +31,8 @@ def findFile(search_dir,search_type, search_object):
             reqSizeB = int(reqSize) * 1024 * 1024
         elif sizeUnitCode == 'GB':
             reqSizeB = int(reqSize) * 1024 * 1024 * 1024
-    print("Required size of "  + reqSize + sizeUnitCode + "in bytes is " + str(reqSizeB))    
-    search_full = search_dir+"**/"+search_object
+    #print("Required size of "  + reqSize + sizeUnitCode + "in bytes is " + str(reqSizeB))    
+    search_full = search_dir+iter_dir+search_object
 
     print("Now looking for " + search_full)
 
@@ -59,14 +62,26 @@ def main():
     search_type=sys.argv[2] # -name, -size 
     search_object=sys.argv[3] #filename or file minimum size
     print('We are here!')
+    
+    op_system = platform.system()
+
+    if op_system == 'Windows':
+        iter_dir = "**\\"
+        slash_path = "\\"
+    elif (op_system == 'Linux') or (op_system == 'Darwin'):
+        iter_dir = "**/"
+        iter_dir = "**/"
+        slash_path = "//"
+        
+    print("Operating system is " + op_system + "iter_dir is " + iter_dir + " and slash_path is " + slash_path)
 
     # if . has been passed as the dir it needs to be changed to full path
     if search_dir == '.':
-        search_dir = os.getcwd() + '/'
+        search_dir = os.getcwd() + slash_path
 
     print('Target directory, search type and search object is ' + search_dir + search_type + search_object)
 
-    findFile(search_dir,search_type, search_object)
+    findFile(search_dir,search_type, search_object, iter_dir)
 
 if __name__ == '__main__':
     main()
