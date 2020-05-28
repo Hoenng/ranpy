@@ -2,9 +2,8 @@
 
 import sys
 import os
-import glob
 import enum
-import platform
+from pathlib import Path
 
 
 #Example ./find.py '/mnt/d/bin/' -name '*.py'. 
@@ -14,7 +13,7 @@ import platform
 #That trailing / is essential
 
  
-def findFile(search_dir,search_type, search_object, iter_dir):
+def findFile(search_dir,search_type, search_object):
 
     # if it is a size search search_object will contain size
     # move that value to search_size and change search_object
@@ -32,11 +31,10 @@ def findFile(search_dir,search_type, search_object, iter_dir):
         elif sizeUnitCode == 'GB':
             reqSizeB = int(reqSize) * 1024 * 1024 * 1024
     #print("Required size of "  + reqSize + sizeUnitCode + "in bytes is " + str(reqSizeB))    
-    search_full = search_dir+iter_dir+search_object
 
-    print("Now looking for " + search_full)
+    print("Now looking for " + str(search_dir))
 
-    for file in glob.iglob(search_full, recursive = True):
+    for file in Path(search_dir).rglob(search_object):
         #if size is wanted tag in a call to file_size
         # check size against requirement
         # print if it meets
@@ -44,7 +42,7 @@ def findFile(search_dir,search_type, search_object, iter_dir):
             fileSize = file_size(file)
             #print("File size and required size are " + str(fileSize) + "and" + reqSizeB)
             if int(fileSize) >= int(reqSizeB):
-                print(file + ' ' + str(fileSize) + ' ' +  str(reqSizeB) + ' ' + sizeUnitCode) 
+                print(str(file) + ' ' + str(fileSize) + ' ' +  str(reqSizeB) + ' ' + sizeUnitCode) 
         if search_type == '-name':
         #otherwise if name search print names
             print(file)
@@ -63,25 +61,14 @@ def main():
     search_object=sys.argv[3] #filename or file minimum size
     print('We are here!')
     
-    op_system = platform.system()
-
-    if op_system == 'Windows':
-        iter_dir = "**\\"
-        slash_path = "\\"
-    elif (op_system == 'Linux') or (op_system == 'Darwin'):
-        iter_dir = "**/"
-        iter_dir = "**/"
-        slash_path = "//"
-        
-    print("Operating system is " + op_system + "iter_dir is " + iter_dir + " and slash_path is " + slash_path)
 
     # if . has been passed as the dir it needs to be changed to full path
     if search_dir == '.':
-        search_dir = os.getcwd() + slash_path
+        search_dir = Path.cwd()
 
-    print('Target directory, search type and search object is ' + search_dir + search_type + search_object)
+    print('Target directory, search type and search object is ' + str(search_dir) + search_type + search_object)
 
-    findFile(search_dir,search_type, search_object, iter_dir)
+    findFile(search_dir,search_type, search_object)
 
 if __name__ == '__main__':
     main()
